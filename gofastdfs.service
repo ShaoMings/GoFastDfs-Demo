@@ -1,0 +1,16 @@
+[Unit]
+Description=gofastdfs service 
+Wants=network.target 
+
+[Service]
+PIDFile=/home/shaoming/shaoming/gofastdfs/conf/app.pid
+WorkingDirectory=/home/shaoming/gofastdfs
+Environment="GO_FASTDFS_DIR=/home/shaoming/gofastdfs" #/home/gofastdfs 修改成你的安装路径
+ExecStart=/home/shaoming/gofastdfs/fileserver $GO_FASTDFS_DIR
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+Restart=always
+
+[Install] 
+WantedBy=multi-user.target

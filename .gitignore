@@ -1,0 +1,9 @@
+.idea
+.github
+vendor/*
+data/*
+files/*
+conf/*
+build/*
+log/*
+dist/
