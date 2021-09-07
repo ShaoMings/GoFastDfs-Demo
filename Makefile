@@ -28,7 +28,7 @@ ALL_LINUX = linux-amd64 \
 
 ALL = $(ALL_LINUX) \
 		darwin-amd64 \
-		darwin-arm64
+#		darwin-arm64
 
 build_linux: $(ALL_LINUX:%=build/%)
 

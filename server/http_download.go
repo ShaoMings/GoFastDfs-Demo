@@ -234,6 +234,14 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 	if Config().EnableDownloadAuth && Config().AuthUrl != "" && !c.IsPeer(r) && !c.CheckAuth(w, r) {
 		return false, errors.New("auth fail")
 	}
+	println(Config().DownloadUseToken)
+
+	if Config().DownloadUseToken {
+		if r.FormValue("token") == "" || !strings.Contains(r.RequestURI, "token=") {
+			return false, errors.New("need token")
+		}
+	}
+
 	if Config().DownloadUseToken && !c.IsPeer(r) {
 		token = r.FormValue("token")
 		timestamp = r.FormValue("timestamp")
@@ -266,6 +274,75 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 			return ok, nil
 		}
 	}
+
+	if Config().DownloadUseToken && strings.Contains(r.RequestURI, "token=") {
+		url := r.RequestURI
+		token = url[strings.LastIndex(url, "token=")+6 : strings.LastIndex(url, "timestamp=")-1]
+		timestamp = url[strings.LastIndex(url, "timestamp=")+10:]
+		if token == "" || timestamp == "" {
+			return false, errors.New("unvalid request")
+		}
+		maxTimestamp = time.Now().Add(time.Second *
+			time.Duration(Config().DownloadTokenExpire)).Unix()
+		minTimestamp = time.Now().Add(-time.Second *
+			time.Duration(Config().DownloadTokenExpire)).Unix()
+		if ts, err = strconv.ParseInt(timestamp, 10, 64); err != nil {
+			return false, errors.New("unvalid timestamp")
+		}
+		if ts > maxTimestamp || ts < minTimestamp {
+			return false, errors.New("timestamp expire")
+		}
+		fullpath, smallPath = c.GetFilePathFromRequest(w, r)
+		if smallPath != "" {
+			pathMd5 = c.util.MD5(smallPath)
+		} else {
+			pathMd5 = c.util.MD5(fullpath)
+		}
+		if fileInfo, err = c.GetFileInfoFromLevelDB(pathMd5); err != nil {
+			// TODO
+		} else {
+			ok := CheckToken(token, fileInfo.Md5, timestamp)
+			if !ok {
+				return ok, errors.New("unvalid token")
+			}
+			return ok, nil
+		}
+	}
+	///
+
+	//if Config().DownloadUseToken && c.IsPeer(r) {
+	//	token = r.FormValue("token")
+	//	timestamp = r.FormValue("timestamp")
+	//	if token == "" || timestamp == "" {
+	//		return false, errors.New("unvalid request")
+	//	}
+	//	maxTimestamp = time.Now().Add(time.Second *
+	//		time.Duration(Config().DownloadTokenExpire)).Unix()
+	//	minTimestamp = time.Now().Add(-time.Second *
+	//		time.Duration(Config().DownloadTokenExpire)).Unix()
+	//	if ts, err = strconv.ParseInt(timestamp, 10, 64); err != nil {
+	//		return false, errors.New("unvalid timestamp")
+	//	}
+	//	if ts > maxTimestamp || ts < minTimestamp {
+	//		return false, errors.New("timestamp expire")
+	//	}
+	//	fullpath, smallPath = c.GetFilePathFromRequest(w, r)
+	//	if smallPath != "" {
+	//		pathMd5 = c.util.MD5(smallPath)
+	//	} else {
+	//		pathMd5 = c.util.MD5(fullpath)
+	//	}
+	//	if fileInfo, err = c.GetFileInfoFromLevelDB(pathMd5); err != nil {
+	//		// TODO
+	//	} else {
+	//		ok := CheckToken(token, fileInfo.Md5, timestamp)
+	//		if !ok {
+	//			return ok, errors.New("unvalid token")
+	//		}
+	//		return ok, nil
+	//	}
+	//}
+
 	if Config().EnableGoogleAuth && !c.IsPeer(r) {
 		fullpath = r.RequestURI[len(Config().Group)+2 : len(r.RequestURI)]
 		fullpath = strings.Split(fullpath, "?")[0] // just path
@@ -426,6 +503,11 @@ func (c *Server) DownloadNotFound(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+type ShareResponse struct {
+	Code  string `json:"code"`
+	Check string `json:"check"`
+}
+
 func (c *Server) Download(w http.ResponseWriter, r *http.Request) {
 	var (
 		err       error
@@ -434,6 +516,7 @@ func (c *Server) Download(w http.ResponseWriter, r *http.Request) {
 		smallPath string
 		fi        os.FileInfo
 	)
+
 	// redirect to upload
 	if r.RequestURI == "/" || r.RequestURI == "" ||
 		r.RequestURI == "/"+Config().Group ||
@@ -446,7 +529,7 @@ func (c *Server) Download(w http.ResponseWriter, r *http.Request) {
 		c.NotPermit(w, r)
 		return
 	}
-
+	// 跨域设置
 	if Config().EnableCrossOrigin {
 		c.CrossOrigin(w, r)
 	}
@@ -487,6 +570,7 @@ func (c *Server) DownloadFileToResponse(url string, w http.ResponseWriter, r *ht
 		log.Error(err)
 		return
 	}
+
 	defer resp.Body.Close()
 	_, err = io.Copy(w, resp.Body)
 	if err != nil {

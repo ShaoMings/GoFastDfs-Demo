@@ -3,6 +3,8 @@ package server
 import (
 	"errors"
 	"fmt"
+	"github.com/axgle/mahonia"
+	log "github.com/sjqzhang/seelog"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -11,8 +13,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	log "github.com/sjqzhang/seelog"
 )
 
 func (c *Server) SyncFileInfo(w http.ResponseWriter, r *http.Request) {
@@ -74,6 +74,9 @@ func (c *Server) Upload(w http.ResponseWriter, r *http.Request) {
 		fpTmp  *os.File
 		fpBody *os.File
 	)
+
+	enc := mahonia.NewDecoder("UTF-8")
+	println(enc.ConvertString(r.FormValue("path")))
 	println(r.FormValue("path"))
 	println(r.FormValue("scene"))
 	if r.Method == http.MethodGet {
@@ -244,12 +247,9 @@ func (c *Server) upload(w http.ResponseWriter, r *http.Request) {
 			if v, _ := c.GetFileInfoFromLevelDB(fileInfo.Md5); v != nil && v.Md5 != "" {
 				fileResult = c.BuildFileResult(v, r)
 				if c.GetFilePathByInfo(&fileInfo, false) != c.GetFilePathByInfo(v, false) {
-					fmt.Println("c.GetFilePathByInfo(&fileInfo, false) != c.GetFilePathByInfo(v, false)")
-					fmt.Println("fileInfo path:", fileInfo.Path)
 					os.Remove(c.GetFilePathByInfo(v, false))
 					_, err = c.SaveUploadFile(uploadFile, uploadHeader, &fileInfo, r)
 					fileInfo.Md5 = c.util.MD5(c.GetFilePathByInfo(&fileInfo, false))
-					fmt.Println("uploadMd5: ", fileInfo.Md5)
 					c.saveFileMd5Log(&fileInfo, CONST_FILE_Md5_FILE_NAME)
 					fileResult = c.BuildFileResult(&fileInfo, r)
 				}
@@ -260,23 +260,18 @@ func (c *Server) upload(w http.ResponseWriter, r *http.Request) {
 				}
 				if output == "json" || output == "json2" {
 					if output == "json2" {
-						fmt.Println("1")
 						result.Data = fileResult
 						result.Status = "ok"
 						w.Write([]byte(c.util.JsonEncodePretty(result)))
 						return
 					}
-					fmt.Println("1.2")
 					w.Write([]byte(c.util.JsonEncodePretty(fileResult)))
 				} else {
-					fmt.Println("1.3")
 					w.Write([]byte(fileResult.Url))
 				}
-				fmt.Println("1.4")
 				return
 			}
 		}
-		fmt.Println("2")
 		if fileInfo.Md5 == "" {
 			msg = " fileInfo.Md5 is null"
 			log.Warn(msg)

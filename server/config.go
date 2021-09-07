@@ -80,6 +80,7 @@ const (
 	CONST_FILE_Md5_FILE_NAME       = "files.md5"
 	CONST_REMOME_Md5_FILE_NAME     = "removes.md5"
 	CONST_SMALL_FILE_SIZE          = 1024 * 1024
+	CONST_AES_SALT_KEY             = "jcjssljyalg"
 	CONST_MESSAGE_CLUSTER_IP       = "Can only be called by the cluster ip or 127.0.0.1 or admin_ips(cfg.json),current ip:%s"
 	cfgJson                        = `{
 	"绑定端号": "端口",
@@ -133,7 +134,7 @@ const (
 	"告警接收URL": "方法post,参数:subject,message",
 	"alarm_url": "",
 	"下载是否需带token": "真假",
-	"download_use_token": false,
+	"download_use_token": true,
 	"下载token过期时间": "单位秒",
 	"download_token_expire": 600,
 	"是否自动修复": "在超过1亿文件时出现性能问题，取消此选项，请手动按天同步，请查看FAQ",
