@@ -53,3 +53,13 @@ func (c *Server) CheckAuth(w http.ResponseWriter, r *http.Request) bool {
 func (c *Server) NotPermit(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(401)
 }
+
+func (c *Server) CheckAuthToken(w http.ResponseWriter, r *http.Request) string {
+	auth_token := r.FormValue("auth_token")
+	if auth_token == c.util.MD5(c.util.MD5("localhost@shaomingauth_token")) {
+		return "ok"
+	} else {
+		return "fail"
+	}
+
+}
