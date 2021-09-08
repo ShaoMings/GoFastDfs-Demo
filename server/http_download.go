@@ -220,6 +220,9 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 		smallPath    string
 		pathMd5      string
 		fileInfo     *FileInfo
+		req          *httplib.BeegoHTTPRequest
+		result       string
+		jsonResult   JsonResult
 		scene        string
 		secret       interface{}
 		code         string
@@ -234,13 +237,11 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 	if Config().EnableDownloadAuth && Config().AuthUrl != "" && !c.IsPeer(r) && !c.CheckAuth(w, r) {
 		return false, errors.New("auth fail")
 	}
-	println(Config().DownloadUseToken)
-
-	if Config().DownloadUseToken {
-		if r.FormValue("token") == "" || !strings.Contains(r.RequestURI, "token=") {
-			return false, errors.New("need token")
-		}
-	}
+	//if Config().DownloadUseToken {
+	//	if r.FormValue("token") == "" || !strings.Contains(r.RequestURI, "token=") {
+	//		return false, errors.New("need token")
+	//	}
+	//}
 
 	if Config().DownloadUseToken && !c.IsPeer(r) {
 		token = r.FormValue("token")
@@ -275,22 +276,49 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 		}
 	}
 
-	if Config().DownloadUseToken && strings.Contains(r.RequestURI, "token=") {
-		url := r.RequestURI
-		token = url[strings.LastIndex(url, "token=")+6 : strings.LastIndex(url, "timestamp=")-1]
-		timestamp = url[strings.LastIndex(url, "timestamp=")+10:]
-		if token == "" || timestamp == "" {
+	if Config().DownloadUseToken && !strings.Contains(r.RequestURI, "auth_token=") {
+		return false, errors.New("need download token")
+	}
+
+	if Config().DownloadUseToken && strings.Contains(r.RequestURI, "auth_token=") {
+		tmp_url := r.RequestURI
+		begin := strings.LastIndex(tmp_url, "auth_token=") + 11
+		token = tmp_url[begin : begin+32]
+		group := Config().Group
+		path := tmp_url[strings.Index(tmp_url, group+"/")+len(group)+1 : strings.Index(tmp_url, "auth_token")-1]
+		if token == "" {
 			return false, errors.New("unvalid request")
 		}
-		maxTimestamp = time.Now().Add(time.Second *
-			time.Duration(Config().DownloadTokenExpire)).Unix()
-		minTimestamp = time.Now().Add(-time.Second *
-			time.Duration(Config().DownloadTokenExpire)).Unix()
-		if ts, err = strconv.ParseInt(timestamp, 10, 64); err != nil {
-			return false, errors.New("unvalid timestamp")
+		path = url.QueryEscape(path)
+		req = httplib.Get(Config().AuthUrl + "?auth_token=" + token + "&path=" + path)
+		req.SetTimeout(time.Second*10, time.Second*10)
+		req.Param("__path__", r.URL.Path)
+		req.Param("__query__", r.URL.RawQuery)
+		for k, _ := range r.Form {
+			req.Param(k, r.FormValue(k))
 		}
-		if ts > maxTimestamp || ts < minTimestamp {
-			return false, errors.New("timestamp expire")
+		for k, v := range r.Header {
+			req.Header(k, v[0])
+		}
+		result, err = req.String()
+		result = strings.TrimSpace(result)
+		if strings.HasPrefix(result, "{") && strings.HasSuffix(result, "}") {
+			if err = json.Unmarshal([]byte(result), &jsonResult); err != nil {
+				log.Error(err)
+				return false, errors.New("error")
+			}
+			if jsonResult.Data != "ok" {
+				log.Warn(result)
+				return false, errors.New("error")
+			}
+		} else {
+			if result != "ok" {
+				log.Warn(result)
+				return false, errors.New("error")
+			}
+		}
+		if result == "ok" {
+			ok = true
 		}
 		fullpath, smallPath = c.GetFilePathFromRequest(w, r)
 		if smallPath != "" {
@@ -301,47 +329,9 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 		if fileInfo, err = c.GetFileInfoFromLevelDB(pathMd5); err != nil {
 			// TODO
 		} else {
-			ok := CheckToken(token, fileInfo.Md5, timestamp)
-			if !ok {
-				return ok, errors.New("unvalid token")
-			}
 			return ok, nil
 		}
 	}
-	///
-
-	//if Config().DownloadUseToken && c.IsPeer(r) {
-	//	token = r.FormValue("token")
-	//	timestamp = r.FormValue("timestamp")
-	//	if token == "" || timestamp == "" {
-	//		return false, errors.New("unvalid request")
-	//	}
-	//	maxTimestamp = time.Now().Add(time.Second *
-	//		time.Duration(Config().DownloadTokenExpire)).Unix()
-	//	minTimestamp = time.Now().Add(-time.Second *
-	//		time.Duration(Config().DownloadTokenExpire)).Unix()
-	//	if ts, err = strconv.ParseInt(timestamp, 10, 64); err != nil {
-	//		return false, errors.New("unvalid timestamp")
-	//	}
-	//	if ts > maxTimestamp || ts < minTimestamp {
-	//		return false, errors.New("timestamp expire")
-	//	}
-	//	fullpath, smallPath = c.GetFilePathFromRequest(w, r)
-	//	if smallPath != "" {
-	//		pathMd5 = c.util.MD5(smallPath)
-	//	} else {
-	//		pathMd5 = c.util.MD5(fullpath)
-	//	}
-	//	if fileInfo, err = c.GetFileInfoFromLevelDB(pathMd5); err != nil {
-	//		// TODO
-	//	} else {
-	//		ok := CheckToken(token, fileInfo.Md5, timestamp)
-	//		if !ok {
-	//			return ok, errors.New("unvalid token")
-	//		}
-	//		return ok, nil
-	//	}
-	//}
 
 	if Config().EnableGoogleAuth && !c.IsPeer(r) {
 		fullpath = r.RequestURI[len(Config().Group)+2 : len(r.RequestURI)]

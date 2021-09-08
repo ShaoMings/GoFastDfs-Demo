@@ -618,6 +618,9 @@ func (c *Server) SaveFileInfoToLevelDB(key string, fileInfo *FileInfo, db *level
 		data []byte
 	)
 	fmt.Println("save fileInfo to db")
+	if fileInfo.Path == "files" {
+		fileInfo.Path = ""
+	}
 	if fileInfo == nil || db == nil {
 		return nil, errors.New("fileInfo is null or db is null")
 	}

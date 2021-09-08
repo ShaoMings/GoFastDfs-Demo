@@ -3,7 +3,6 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/axgle/mahonia"
 	log "github.com/sjqzhang/seelog"
 	"io"
 	"mime/multipart"
@@ -74,11 +73,7 @@ func (c *Server) Upload(w http.ResponseWriter, r *http.Request) {
 		fpTmp  *os.File
 		fpBody *os.File
 	)
-
-	enc := mahonia.NewDecoder("UTF-8")
-	println(enc.ConvertString(r.FormValue("path")))
 	println(r.FormValue("path"))
-	println(r.FormValue("scene"))
 	if r.Method == http.MethodGet {
 		//fmt.Println("getMethod?")
 		c.upload(w, r)
@@ -408,6 +403,9 @@ func (c *Server) SaveUploadFile(file multipart.File, header *multipart.FileHeade
 			// fileInfo.Path == '' folder :  files/test/video
 			//fmt.Println("fileInfo.Path == '' folder : ", folder)
 		}
+	} else {
+		fileInfo.Path = STORE_DIR
+		folder = fileInfo.Path
 	}
 	// folder :  files/test/video
 	if !c.util.FileExists(folder) {
