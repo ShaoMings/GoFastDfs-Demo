@@ -814,7 +814,11 @@ func (c *Server) BuildFileResult(fileInfo *FileInfo, r *http.Request) FileResult
 	p = strings.Replace(fileInfo.Path, STORE_DIR_NAME+"/", "", 1)
 	//fmt.Println("1. p : ",p)
 	if Config().SupportGroupManage {
-		p = Config().Group + "/" + p + "/" + outname
+		if p == "" {
+			p = Config().Group + "/" + outname
+		} else {
+			p = Config().Group + "/" + p + "/" + outname
+		}
 	} else {
 		p = p + "/" + outname
 	}
