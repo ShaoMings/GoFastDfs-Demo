@@ -514,6 +514,7 @@ func (c *Server) Download(w http.ResponseWriter, r *http.Request) {
 		c.Index(w, r)
 		return
 	}
+
 	if ok, err = c.CheckDownloadAuth(w, r); !ok {
 		log.Error(err)
 		c.NotPermit(w, r)
