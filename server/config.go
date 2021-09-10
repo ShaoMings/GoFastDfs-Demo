@@ -116,7 +116,7 @@ const (
 	"是否支持非日期路径": "默认支持非日期路径,也即支持自定义路径,需要上传文件时指定path",
 	"enable_custom_path": true,
 	"下载域名": "用于外网下载文件的域名",
-	"download_domain": "",
+	"download_domain": "fileserver.com",
 	"场景列表": "当设定后，用户指的场景必项在列表中，默认不做限制(注意：如果想开启场景认功能，格式如下：'场景名:googleauth_secret' 如 default:N7IET373HB2C5M6D ",
 	"scenes": [],
 	"默认场景": "默认default",

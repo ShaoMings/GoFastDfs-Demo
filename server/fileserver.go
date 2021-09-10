@@ -792,7 +792,7 @@ func (c *Server) BuildFileResult(fileInfo *FileInfo, r *http.Request) FileResult
 	if r != nil {
 		host = r.Host
 	}
-	//fmt.Println("host:",host)
+	fmt.Println("host:", host)
 	//fmt.Println("1 . fileInfo.Path :",fileInfo.Path)
 	if !strings.HasPrefix(Config().DownloadDomain, "http") {
 		if Config().DownloadDomain == "" {

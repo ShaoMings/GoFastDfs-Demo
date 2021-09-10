@@ -124,6 +124,7 @@ func bigUpload(filePath string) {
 		if re := recover(); re != nil {
 		}
 	}()
+	println("filePath:" + filePath)
 	f, err := os.Open(filePath)
 	if err != nil {
 

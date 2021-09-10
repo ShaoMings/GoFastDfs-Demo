@@ -142,12 +142,8 @@ func (c *Server) initTus() {
 				log.Info("CompleteUploads", info)
 				name := ""
 				pathCustom := ""
-				scene := Config().DefaultScene
 				if v, ok := info.MetaData["filename"]; ok {
 					name = v
-				}
-				if v, ok := info.MetaData["scene"]; ok {
-					scene = v
 				}
 				if v, ok := info.MetaData["path"]; ok {
 					pathCustom = v
@@ -172,11 +168,16 @@ func (c *Server) initTus() {
 				fpath := time.Now().Format("/20060102/15/04/")
 				if pathCustom != "" {
 					fpath = "/" + strings.Replace(pathCustom, ".", "", -1) + "/"
+				} else {
+					fpath = ""
 				}
-				newFullPath := STORE_DIR + "/" + scene + fpath + Config().PeerId + "/" + filename
-				if pathCustom != "" {
-					newFullPath = STORE_DIR + "/" + scene + fpath + filename
+				newFullPath := ""
+				if fpath == "" {
+					newFullPath = STORE_DIR + "/" + filename
+				} else {
+					newFullPath = STORE_DIR + fpath + filename
 				}
+
 				if fi, err := c.GetFileInfoFromLevelDB(md5sum); err != nil {
 					log.Error(err)
 				} else {
@@ -196,12 +197,8 @@ func (c *Server) initTus() {
 						continue
 					}
 				}
-				fpath2 := ""
-				fpath2 = STORE_DIR_NAME + "/" + Config().DefaultScene + fpath + Config().PeerId
-				if pathCustom != "" {
-					fpath2 = STORE_DIR_NAME + "/" + Config().DefaultScene + fpath
-					fpath2 = strings.TrimRight(fpath2, "/")
-				}
+
+				fpath2 := STORE_DIR_NAME + "/" + fpath
 
 				os.MkdirAll(DOCKER_DIR+fpath2, 0775)
 				fileInfo := &FileInfo{
