@@ -6,3 +6,4 @@ files/*
 build/*
 log/*
 dist/
+main.go

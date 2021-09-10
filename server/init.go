@@ -145,7 +145,7 @@ func (c *Server) initTus() {
 				if v, ok := info.MetaData["filename"]; ok {
 					name = v
 				}
-				if v, ok := info.MetaData["path"]; ok {
+				if v, ok := info.MetaData["path"]; ok && v != "/files" {
 					pathCustom = v
 				}
 				var err error
