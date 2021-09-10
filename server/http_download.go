@@ -508,8 +508,10 @@ func (c *Server) Download(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// redirect to upload
-	if r.RequestURI == "/" || r.RequestURI == "" ||
-		r.RequestURI == "/"+Config().Group ||
+	if
+	//r.RequestURI == "/" ||
+	//	r.RequestURI == "" ||
+	r.RequestURI == "/"+Config().Group ||
 		r.RequestURI == "/"+Config().Group+"/" {
 		c.Index(w, r)
 		return
