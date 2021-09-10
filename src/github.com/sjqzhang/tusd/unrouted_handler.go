@@ -963,7 +963,6 @@ func (handler *UnroutedHandler) validateNewUploadLengthHeaders(uploadLengthHeade
 // e.g. Upload-Metadata: name bHVucmpzLnBuZw==,type aW1hZ2UvcG5n
 func ParseMetadataHeader(header string) map[string]string {
 	meta := make(map[string]string)
-	println("test!!!")
 	for _, element := range strings.Split(header, ",") {
 		element := strings.TrimSpace(element)
 

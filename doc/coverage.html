@@ -3349,49 +3349,7 @@ func (this *Server) Index(w http.ResponseWriter, r *http.Request) <span class="c
                         uploadBigUrl = fmt.Sprintf("/%s%s", Config().Group, CONST_BIG_UPLOAD_PATH_SUFFIX)
                 }</span>
                 <span class="cov8" title="1">fmt.Fprintf(w,
-                        fmt.Sprintf(`&lt;html&gt;
-                          
-                          &lt;head&gt;
-                                &lt;meta charset="utf-8" /&gt;
-                                &lt;title&gt;Uploader&lt;/title&gt;
-                                &lt;style&gt;form { bargin } .form-line { display:block;height: 30px;margin:8px; } #stdUpload {background: #fafafa;border-radius: 10px;width: 745px; }&lt;/style&gt;
-                                &lt;link href="https://transloadit.edgly.net/releases/uppy/v0.30.0/dist/uppy.min.css" rel="stylesheet"&gt;&lt;/head&gt;
-                          
-                          &lt;body&gt;
-                &lt;div&gt;标准上传(强列建议使用这种方式)&lt;/div&gt;
-                                &lt;div id="stdUpload"&gt;
-                                  
-                                  &lt;form action="%s" method="post" enctype="multipart/form-data"&gt;
-                                        &lt;span class="form-line"&gt;文件(file):
-                                          &lt;input type="file" id="file" name="file" /&gt;&lt;/span&gt;
-                                        &lt;span class="form-line"&gt;场景(scene):
-                                          &lt;input type="text" id="scene" name="scene" value="%s" /&gt;&lt;/span&gt;
-                                        &lt;span class="form-line"&gt;输出(output):
-                                          &lt;input type="text" id="output" name="output" value="json" /&gt;&lt;/span&gt;
-                                        &lt;span class="form-line"&gt;自定义路径(path):
-                                          &lt;input type="text" id="path" name="path" value="" /&gt;&lt;/span&gt;
-                                        &lt;input type="submit" name="submit" value="upload" /&gt;&lt;/form&gt;
-                                &lt;/div&gt;
-                 &lt;div&gt;断点续传（如果文件很大时可以考虑）&lt;/div&gt;
-                                &lt;div&gt;
-                                 
-                                  &lt;div id="drag-drop-area"&gt;&lt;/div&gt;
-                                  &lt;script src="https://transloadit.edgly.net/releases/uppy/v0.30.0/dist/uppy.min.js"&gt;&lt;/script&gt;
-                                  &lt;script&gt;var uppy = Uppy.Core().use(Uppy.Dashboard, {
-                                          inline: true,
-                                          target: '#drag-drop-area'
-                                        }).use(Uppy.Tus, {
-                                          endpoint: '%s'
-                                        })
-
-                                        uppy.on('complete', (result) =&gt; {
-                                         // console.log(result) console.log('Upload complete! We’ve uploaded these files:', result.successful)
-                                        })
-                &lt;/script&gt;
-                                &lt;/div&gt;
-                          &lt;/body&gt;
-
-                        &lt;/html&gt;`, uploadUrl, Config().DefaultScene, uploadBigUrl))</span>
+                         uploadUrl, Config().DefaultScene, uploadBigUrl))</span>
         }<span class="cov0" title="0"> else {
                 w.Write([]byte("web upload deny"))
         }</span>
