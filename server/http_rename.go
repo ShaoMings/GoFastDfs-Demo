@@ -37,6 +37,7 @@ func (c *Server) RenameFileOrFolder(w http.ResponseWriter, r *http.Request) {
 			}
 			os.Rename(oldPath, newPathBackup)
 		} else {
+			newFileName := string([]rune(newPath)[UnicodeIndex(newPath, "/")+1:])
 			v, err := c.GetFileInfoFromLevelDB(md5)
 			md5 = c.util.MD5(newPath)
 			if err == nil {
@@ -45,9 +46,10 @@ func (c *Server) RenameFileOrFolder(w http.ResponseWriter, r *http.Request) {
 					tmpPath := v.Path + "/" + v.Name
 					// 不等
 					if strings.Compare(tmpPath, oldPath) != 0 {
-						v.Name = string([]rune(newPath)[strings.LastIndex(newPath, "/")+1:])
+						v.Name = newFileName
 					}
 				}
+				v.Name = newFileName
 				v.Md5 = md5
 			}
 			if c.util.FileExists(oldPath) {
@@ -66,4 +68,19 @@ func (c *Server) RenameFileOrFolder(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(c.util.JsonEncodePretty(result)))
 	}
 
+}
+
+func UnicodeIndex(str, substr string) int {
+	// 子串在字符串的字节位置
+	result := strings.LastIndex(str, substr)
+	if result >= 0 {
+		// 获得子串之前的字符串并转换成[]byte
+		prefix := []byte(str)[0:result]
+		// 将子串之前的字符串转换成[]rune
+		rs := []rune(string(prefix))
+		// 获得子串之前的字符串的长度，便是子串在字符串的字符位置
+		result = len(rs)
+	}
+
+	return result
 }

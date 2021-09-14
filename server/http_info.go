@@ -393,6 +393,7 @@ func (c *Server) Status(w http.ResponseWriter, r *http.Request) {
 func (c *Server) HeartBeat(w http.ResponseWriter, r *http.Request) {
 }
 
+// ListDir 获取用户目录
 func (c *Server) ListDir(w http.ResponseWriter, r *http.Request) {
 	var (
 		result      JsonResult
