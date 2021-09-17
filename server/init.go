@@ -197,9 +197,12 @@ func (c *Server) initTus() {
 						continue
 					}
 				}
-
-				fpath2 := STORE_DIR_NAME + "/" + fpath
-
+				fpath2 := ""
+				if strings.HasPrefix(fpath, "/") {
+					fpath2 = STORE_DIR_NAME + fpath
+				} else {
+					fpath2 = STORE_DIR_NAME + "/" + fpath
+				}
 				os.MkdirAll(DOCKER_DIR+fpath2, 0775)
 				fileInfo := &FileInfo{
 					Name:      name,
