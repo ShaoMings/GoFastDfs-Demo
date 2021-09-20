@@ -323,6 +323,43 @@ func (c *Server) GetMd5File(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+var fileCount int64
+var fileSize int64
+
+type DirInfo struct {
+	Count int64 `json:"count"`
+	Size  int64 `json:"size"`
+}
+
+// StatusByUserPath 获取指定目录下的文件数量以及总大小
+func (c *Server) StatusByUserPath(w http.ResponseWriter, r *http.Request) {
+	var (
+		status JsonResult
+		info   DirInfo
+	)
+	userPath := STORE_DIR + "/" + r.FormValue("userPath")
+	fileCount = 0
+	fileSize = 0
+	getFileList(userPath)
+	info.Count = fileCount
+	info.Size = fileSize
+	status.Status = "ok"
+	status.Data = info
+	w.Write([]byte(c.util.JsonEncodePretty(status)))
+}
+
+func getFileList(path string) {
+	fs, _ := ioutil.ReadDir(path)
+	for _, file := range fs {
+		if file.IsDir() {
+			getFileList(path + "/" + file.Name() + "/")
+		} else {
+			fileCount++
+			fileSize = fileSize + file.Size()
+		}
+	}
+}
+
 func (c *Server) Status(w http.ResponseWriter, r *http.Request) {
 	var (
 		status   JsonResult

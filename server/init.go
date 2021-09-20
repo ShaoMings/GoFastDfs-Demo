@@ -133,7 +133,9 @@ func (c *Server) initTus() {
 						req := httplib.Post(callback_url)
 						req.SetTimeout(time.Second*10, time.Second*10)
 						req.Param("info", server.util.JsonEncodePretty(fileInfo))
-						req.Param("id", info.ID)
+						//req.Param("id", info.ID)
+						// 返回组名
+						req.Param("group", Config().Group)
 						if _, err := req.String(); err != nil {
 							log.Error(err)
 						}

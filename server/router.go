@@ -30,6 +30,7 @@ func (c *Server) initRouter() {
 	http.HandleFunc(fmt.Sprintf("%s/stat", groupRoute), c.Stat)
 	http.HandleFunc(fmt.Sprintf("%s/repair_stat", groupRoute), c.RepairStatWeb)
 	http.HandleFunc(fmt.Sprintf("%s/status", groupRoute), c.Status)
+	http.HandleFunc(fmt.Sprintf("%s/userStatus", groupRoute), c.StatusByUserPath)
 	http.HandleFunc(fmt.Sprintf("%s/repair", groupRoute), c.Repair)
 	http.HandleFunc(fmt.Sprintf("%s/report", groupRoute), c.Report)
 	http.HandleFunc(fmt.Sprintf("%s/backup", groupRoute), c.BackUp)
