@@ -349,13 +349,15 @@ func (c *Server) StatusByUserPath(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFileList(path string) {
-	fs, _ := ioutil.ReadDir(path)
-	for _, file := range fs {
-		if file.IsDir() {
-			getFileList(path + "/" + file.Name() + "/")
-		} else {
-			fileCount++
-			fileSize = fileSize + file.Size()
+	if path != "files/_tmp" && path != "files/_big" {
+		fs, _ := ioutil.ReadDir(path)
+		for _, file := range fs {
+			if file.IsDir() {
+				getFileList(path + "/" + file.Name() + "/")
+			} else {
+				fileCount++
+				fileSize = fileSize + file.Size()
+			}
 		}
 	}
 }
@@ -413,6 +415,13 @@ func (c *Server) Status(w http.ResponseWriter, r *http.Request) {
 	sts["Sys.GCSys"] = memStat.GCSys
 	//sts["Sys.MemInfo"] = memStat
 	diskInfo, err = disk.Usage(STORE_DIR)
+	sts["peerTotal"] = diskInfo.Total
+	sts["peerFree"] = diskInfo.Free
+	fileCount = 0
+	fileSize = 0
+	getFileList(STORE_DIR)
+	sts["peerUsed"] = fileSize
+	sts["peerFileCount"] = fileCount
 	if err != nil {
 		log.Error(err)
 	}
