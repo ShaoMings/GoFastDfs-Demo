@@ -499,7 +499,7 @@ func (c *Server) saveFileMd5Log(fileInfo *FileInfo, filename string) {
 	if filename == CONST_FILE_Md5_FILE_NAME {
 		//c.searchMap.Put(fileInfo.Md5, fileInfo.Name)
 		if ok, err = c.IsExistFromLevelDB(fileInfo.Md5, c.ldb); !ok {
-			fmt.Println("save md5:", fileInfo.Md5)
+			//fmt.Println("save md5:", fileInfo.Md5)
 			c.statMap.AddCountInt64(logDate+"_"+CONST_STAT_FILE_COUNT_KEY, 1)
 			c.statMap.AddCountInt64(logDate+"_"+CONST_STAT_FILE_TOTAL_SIZE_KEY, fileInfo.Size)
 			c.SaveStat()
@@ -617,7 +617,7 @@ func (c *Server) SaveFileInfoToLevelDB(key string, fileInfo *FileInfo, db *level
 		err  error
 		data []byte
 	)
-	fmt.Println("save fileInfo to db")
+	//fmt.Println("save fileInfo to db")
 	if fileInfo.Path == "files" {
 		fileInfo.Path = ""
 	}

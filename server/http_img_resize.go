@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -26,7 +25,7 @@ func (c *Server) ResizeImageByBytes(w http.ResponseWriter, data []byte, width, h
 		log.Error(err)
 		return
 	}
-	fmt.Println(width, height)
+	//fmt.Println(width, height)
 	img = resize.Resize(width, height, img, resize.Lanczos3)
 	if imgType == "jpg" || imgType == "jpeg" {
 		jpeg.Encode(w, img, nil)

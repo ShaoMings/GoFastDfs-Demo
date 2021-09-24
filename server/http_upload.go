@@ -73,7 +73,7 @@ func (c *Server) Upload(w http.ResponseWriter, r *http.Request) {
 		fpTmp  *os.File
 		fpBody *os.File
 	)
-	println(r.FormValue("path"))
+	//println(r.FormValue("path"))
 	if r.Method == http.MethodGet {
 		//fmt.Println("getMethod?")
 		c.upload(w, r)
@@ -232,7 +232,7 @@ func (c *Server) upload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if _, err = c.SaveUploadFile(uploadFile, uploadHeader, &fileInfo, r); err != nil {
-			fmt.Println("test saveUploadFile")
+			//fmt.Println("test saveUploadFile")
 			result.Message = err.Error()
 			log.Error(err)
 			w.Write([]byte(c.util.JsonEncodePretty(result)))
@@ -294,11 +294,11 @@ func (c *Server) upload(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		fmt.Println("3")
+		//fmt.Println("3")
 		// 保存md5
-		fmt.Println(fileInfo.Md5)
+		//fmt.Println(fileInfo.Md5)
 		c.saveFileMd5Log(&fileInfo, CONST_FILE_Md5_FILE_NAME) //maybe slow
-		fmt.Println("4")
+		//fmt.Println("4")
 		go c.postFileToPeer(&fileInfo)
 		if fileInfo.Size <= 0 {
 			msg = "file size is zero"

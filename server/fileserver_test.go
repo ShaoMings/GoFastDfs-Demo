@@ -93,7 +93,7 @@ func uploadContinueBig(t *testing.T) {
 	if err := httplib.Get(url).ToFile(CONST_DOWNLOAD_BIG_FILE_NAME); err != nil {
 		t.Error(err)
 	}
-	fmt.Println(url)
+	//fmt.Println(url)
 
 	if md5sum, err := testUtil.GetFileSumByName(CONST_DOWNLOAD_BIG_FILE_NAME, ""); md5sum != testBigFileMd5 {
 		t.Error("uploadContinue bigfile  download fail")
@@ -107,7 +107,7 @@ func refreshConfig(t *testing.T) {
 		cfg    GlobalConfig
 		err    error
 		cfgStr string
-		result string
+		_      string
 	)
 
 	if testCfg == nil {
@@ -120,7 +120,7 @@ func refreshConfig(t *testing.T) {
 	fmt.Println("refreshConfig")
 	req := httplib.Post(endPoint + "/reload?action=set")
 	req.Param("cfg", cfgStr)
-	result, err = req.String()
+	_, err = req.String()
 
 	if err != nil {
 		t.Error(err)
@@ -128,12 +128,12 @@ func refreshConfig(t *testing.T) {
 
 	req = httplib.Get(endPoint + "/reload?action=reload")
 
-	result, err = req.String()
+	_, err = req.String()
 	if err != nil {
 		t.Error(err)
 
 	}
-	fmt.Println(result)
+	//fmt.Println(result)
 
 }
 
@@ -143,7 +143,7 @@ func testConfig(t *testing.T) {
 		cfg        GlobalConfig
 		err        error
 		cfgStr     string
-		result     string
+		_          string
 		jsonResult JsonResult
 	)
 
@@ -158,7 +158,7 @@ func testConfig(t *testing.T) {
 
 	cfgStr = testUtil.JsonEncodePretty(cfg)
 	cfgStr = testUtil.JsonEncodePretty(jsonResult.Data.(map[string]interface{}))
-	fmt.Println("cfg:\n", cfgStr)
+	//fmt.Println("cfg:\n", cfgStr)
 	if err = json2.Unmarshal([]byte(cfgStr), &cfg); err != nil {
 		t.Error(err)
 		return
@@ -179,7 +179,7 @@ func testConfig(t *testing.T) {
 	cfgStr = testUtil.JsonEncodePretty(cfg)
 	req = httplib.Post(endPoint + "/reload?action=set")
 	req.Param("cfg", cfgStr)
-	result, err = req.String()
+	_, err = req.String()
 
 	if err != nil {
 		t.Error(err)
@@ -187,12 +187,12 @@ func testConfig(t *testing.T) {
 
 	req = httplib.Get(endPoint + "/reload?action=reload")
 
-	result, err = req.String()
+	_, err = req.String()
 	if err != nil {
 		t.Error(err)
 
 	}
-	fmt.Println(result)
+	//fmt.Println(result)
 
 }
 

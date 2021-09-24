@@ -111,11 +111,11 @@ func normalUpload(filePath string) {
 	req.Param("path", *Scene+"/"+strings.TrimLeft(path, "/"))
 	req.Param("filename", filename)
 	req.Retries(-1)
-	if s, err := req.String(); err != nil {
-		fmt.Println(err, filePath)
-	} else {
-		fmt.Println(s, filePath)
-	}
+	//if s, err := req.String(); err != nil {
+	//	fmt.Println(err, filePath)
+	//} else {
+	//	fmt.Println(s, filePath)
+	//}
 
 }
 
@@ -124,7 +124,7 @@ func bigUpload(filePath string) {
 		if re := recover(); re != nil {
 		}
 	}()
-	println("filePath:" + filePath)
+	//println("filePath:" + filePath)
 	f, err := os.Open(filePath)
 	if err != nil {
 

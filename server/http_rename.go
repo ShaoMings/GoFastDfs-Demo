@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -41,7 +40,7 @@ func (c *Server) RenameFileOrFolder(w http.ResponseWriter, r *http.Request) {
 			v, err := c.GetFileInfoFromLevelDB(md5)
 			md5 = c.util.MD5(newPath)
 			if err == nil {
-				fmt.Println(v.Name)
+				//fmt.Println(v.Name)
 				if v.Name != "" {
 					tmpPath := v.Path + "/" + v.Name
 					// 不等
