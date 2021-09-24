@@ -21,7 +21,7 @@ func (c *Server) CheckAuth(w http.ResponseWriter, r *http.Request) bool {
 		log.Error(err)
 		return false
 	}
-	println("post 验证token")
+	//println("post 验证token")
 	if Config().DownloadUseToken && strings.Contains(r.RequestURI, "auth_token=") {
 		tmpUrl := r.RequestURI
 		begin := strings.LastIndex(tmpUrl, "auth_token=") + 11
@@ -31,11 +31,12 @@ func (c *Server) CheckAuth(w http.ResponseWriter, r *http.Request) bool {
 		if token == "" {
 			return false
 		}
+		// url 编码 开启可能导致token验证失败
 		//path = url.QueryEscape(path)
 		token = strings.TrimSpace(token)
-		println("token:", token)
-		println("token len:", len(token))
-		println("path:", path)
+		//println("token:", token)
+		//println("token len:", len(token))
+		//println("path:", path)
 		req = httplib.Post(Config().AuthUrl).Param("auth_token", token).Param("path", path)
 		req.SetTimeout(time.Second*10, time.Second*10)
 		req.Param("__path__", r.URL.Path)
@@ -53,16 +54,16 @@ func (c *Server) CheckAuth(w http.ResponseWriter, r *http.Request) bool {
 				log.Error(err)
 				return false
 			}
-			println("57:", jsonResult.Data)
 			if jsonResult.Data != "ok" {
 				log.Warn(result)
 				return false
 			}
 		} else {
-			println("63", result)
 			if result != "ok" {
 				log.Warn(result)
 				return false
+			} else {
+				return true
 			}
 		}
 	}

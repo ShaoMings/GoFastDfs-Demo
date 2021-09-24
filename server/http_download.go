@@ -234,23 +234,17 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 		}
 		return true
 	}
-	println("237", !c.IsPeer(r))
 	if Config().EnableDownloadAuth && Config().AuthUrl != "" && !c.IsPeer(r) && !c.CheckAuth(w, r) {
-		println("239?")
 		return false, errors.New("auth fail")
 	}
-	//if Config().DownloadUseToken {
-	//	if r.FormValue("token") == "" || !strings.Contains(r.RequestURI, "token=") {
-	//		return false, errors.New("need token")
-	//	}
-	//}
+	if Config().DownloadUseToken && c.CheckAuth(w, r) {
+		return true, nil
+	}
 
 	if Config().DownloadUseToken && !c.IsPeer(r) {
-		println("249")
 		token = r.FormValue("token")
 		timestamp = r.FormValue("timestamp")
 		if token == "" || timestamp == "" {
-			println("253")
 			return false, errors.New("unvalid request")
 		}
 		maxTimestamp = time.Now().Add(time.Second *
@@ -294,7 +288,6 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 			return false, errors.New("unvalid request")
 		}
 		path = url.QueryEscape(path)
-		println("get 验证token")
 		req = httplib.Get(Config().AuthUrl + "?auth_token=" + token + "&path=" + path)
 		req.SetTimeout(time.Second*10, time.Second*10)
 		req.Param("__path__", r.URL.Path)
