@@ -234,7 +234,9 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 		}
 		return true
 	}
+	println("237", !c.IsPeer(r))
 	if Config().EnableDownloadAuth && Config().AuthUrl != "" && !c.IsPeer(r) && !c.CheckAuth(w, r) {
+		println("239?")
 		return false, errors.New("auth fail")
 	}
 	//if Config().DownloadUseToken {
@@ -244,9 +246,11 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 	//}
 
 	if Config().DownloadUseToken && !c.IsPeer(r) {
+		println("249")
 		token = r.FormValue("token")
 		timestamp = r.FormValue("timestamp")
 		if token == "" || timestamp == "" {
+			println("253")
 			return false, errors.New("unvalid request")
 		}
 		maxTimestamp = time.Now().Add(time.Second *
@@ -281,15 +285,16 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 	}
 
 	if Config().DownloadUseToken && strings.Contains(r.RequestURI, "auth_token=") {
-		tmp_url := r.RequestURI
-		begin := strings.LastIndex(tmp_url, "auth_token=") + 11
-		token = tmp_url[begin : begin+32]
+		tmpUrl := r.RequestURI
+		begin := strings.LastIndex(tmpUrl, "auth_token=") + 11
+		token = tmpUrl[begin : begin+32]
 		group := Config().Group
-		path := tmp_url[strings.Index(tmp_url, group+"/")+len(group)+1 : strings.Index(tmp_url, "auth_token")-1]
+		path := tmpUrl[strings.Index(tmpUrl, group+"/")+len(group)+1 : strings.Index(tmpUrl, "auth_token")-1]
 		if token == "" {
 			return false, errors.New("unvalid request")
 		}
 		path = url.QueryEscape(path)
+		println("get 验证token")
 		req = httplib.Get(Config().AuthUrl + "?auth_token=" + token + "&path=" + path)
 		req.SetTimeout(time.Second*10, time.Second*10)
 		req.Param("__path__", r.URL.Path)
