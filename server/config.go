@@ -152,7 +152,7 @@ const (
 	"是否开启Google认证，实现安全的上传、下载": "默认不开启",
 	"enable_google_auth": false,
 	"认证url": "当url不为空时生效,注意:普通上传中使用http参数 auth_token 作为认证参数, 在断点续传中通过HTTP头Upload-Metadata中的auth_token作为认证参数,认证流程参考认证架构图",
-	"auth_url": "http://localhost:8088/check",
+	"auth_url": "http://localhost:8081/check",
 	"下载是否认证": "默认不认证(注意此选项是在auth_url不为空的情况下生效)",
 	"enable_download_auth": true,
 	"默认是否下载": "默认下载",
