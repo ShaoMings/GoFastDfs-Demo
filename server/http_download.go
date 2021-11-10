@@ -281,7 +281,11 @@ func (c *Server) CheckDownloadAuth(w http.ResponseWriter, r *http.Request) (bool
 	if Config().DownloadUseToken && strings.Contains(r.RequestURI, "auth_token=") {
 		tmpUrl := r.RequestURI
 		begin := strings.LastIndex(tmpUrl, "auth_token=") + 11
-		token = tmpUrl[begin : begin+32]
+		if strings.Contains(r.RequestURI, "&") {
+			token = tmpUrl[begin:strings.Index(tmpUrl, "&")]
+		} else {
+			token = tmpUrl[begin:]
+		}
 		group := Config().Group
 		path := tmpUrl[strings.Index(tmpUrl, group+"/")+len(group)+1 : strings.Index(tmpUrl, "auth_token")-1]
 		if token == "" {
