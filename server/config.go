@@ -136,7 +136,7 @@ const (
 	"下载是否需带token": "真假",
 	"download_use_token": true,
 	"下载token过期时间": "单位秒",
-	"download_token_expire": 600,
+	"download_token_expire": 1,
 	"是否自动修复": "在超过1亿文件时出现性能问题，取消此选项，请手动按天同步，请查看FAQ",
 	"auto_repair": true,
 	"文件去重算法md5可能存在冲突，默认md5": "sha1|md5",

@@ -519,6 +519,14 @@ func (c *Server) Download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !strings.Contains(r.RequestURI, "auth_token=") {
+		return
+	} else {
+		if !c.CheckAuth(w, r) {
+			return
+		}
+	}
+
 	if ok, err = c.CheckDownloadAuth(w, r); !ok {
 		log.Error(err)
 		c.NotPermit(w, r)
